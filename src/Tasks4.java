@@ -50,16 +50,18 @@ public class Tasks4 {
     /** Функция итерирует по всем словам и в зависимости от суммы результирующей строки и следующего слова определяет добавить ли слово в рез. строку или вывести и очистить её*/
     public static void bessie(int n, int k, String essay){
         String[] words = essay.split(" ");
-        String str = words[0];
+        StringBuilder result = new StringBuilder();
+        result.append(words[0]);
         for(int i = 1; i < n; i++){
-            if(words[i].length() + str.length() <= k) {
-                str += " " + words[i];
+            if(words[i].length() + result.length() <= k) {
+                result.append(" " + words[i]);
             } else {
-                System.out.println(str);
-                str = words[i];
+                System.out.println(result.toString());
+                result = new StringBuilder();
+                result.append(words[i]);
             }
         }
-        System.out.println(str);
+        System.out.println(result.toString());
     }
 
     /** Функция считает кол-во кластеров, а затем повторно считывает их в массив посчитанной длины */
@@ -72,7 +74,7 @@ public class Tasks4 {
             else if(lit == r)counter--;
             if(counter == 0)wordCounter++;
         }
-        String temp = "";
+        StringBuilder temp = new StringBuilder();
         String[] answer = new String[wordCounter];
         counter = 0; wordCounter = 0;
         for(char lit: str.toCharArray()){
@@ -80,10 +82,10 @@ public class Tasks4 {
                 counter++;
             }
             else if(lit == r)counter--;
-            temp += lit;
+            temp.append(lit);
             if(counter == 0){
-                answer[wordCounter] = temp;
-                temp = "";
+                answer[wordCounter] = temp.toString();
+                temp = new StringBuilder();
                 wordCounter++;
             }
         }
@@ -93,23 +95,23 @@ public class Tasks4 {
     /** Функция разбивает строку по '_' а затем собирает снова капитализируя каждое слово */
     public static String toCamelCase(String str){
         String[] words = str.split("_");
-        String answer = "";
+        StringBuilder sb = new StringBuilder();
         for(int i = 0; i < words.length; i++){
-            if(i == 0)answer += words[i].toLowerCase();
-            else answer += words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+            if(i == 0)sb.append(words[i].toLowerCase());
+            else sb.append(words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase());
         }
-        return answer;
+        return sb.toString();
     }
 
     /** Функция разбивает строку по заглавным буквам и собирает снова с '_' в нижнем регистре */
     public static String toSnakeCase(String str){
-        String answer = "";
+        StringBuilder sb = new StringBuilder();
         for(int i = 0; i < str.length(); i++){
             if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z'){
-                answer += "_" + str.substring(i, i + 1).toLowerCase();
-            } else answer += str.charAt(i);
+                sb.append("_" + str.substring(i, i + 1).toLowerCase());
+            } else sb.append(str.charAt(i));
         }
-        return answer;
+        return sb.toString();
     }
 
     /** Функция считает кол-во часов обычной работы и кол-во часов сверхурочных, и по ним высчитывает итоговую стоимость */
@@ -148,17 +150,15 @@ public class Tasks4 {
     /** Функция возвращает кол-во перемножений цифр числа */
     public static int bugger(int x){
         int counter = 0;
-        int temp;
         int mull = 1;
-        while ((x / 10) != 0){
-            temp = x;
-            while(temp > 0){
-                mull *= (temp % 10);
-                temp /= 10;
+        while (x > 9){
+            while(x > 0){
+                mull *= (x % 10);
+                x /= 10;
             }
             x = mull;
-            counter++;
             mull = 1;
+            counter++;
         }
         return counter;
     }
@@ -166,38 +166,35 @@ public class Tasks4 {
     /** Подсчитывает кол-во повторений символов и выводит в виде AAAsdg -> A*3sdg */
     public static String toStarShorthand(String word){
         word += " ";
-        String answer = "";
+        StringBuilder sb = new StringBuilder();
         for (char lit: word.toCharArray()){
             int length = word.split(String.valueOf(lit)).length - 1;
-            if(!answer.contains(String.valueOf(lit))){
-                if(length > 1){
-                    answer += lit + "*" + length;
-                } else {
-                    answer += lit;
-                }
+            if(sb.indexOf(String.valueOf(lit)) == -1){
+                sb.append(lit);
+                if(length > 1) sb.append("*" + length);
             }
         }
-        return answer;
+        return sb.toString();
     }
 
     /** Проверяет рифмуются ли слова сравнивая гласные последних слов */
     public static boolean doesRhyme(String word1, String word2){
         String vowels = "aeiou";
-        String vowelsWord1 = "";
-        String vowelsWord2 = "";
+        StringBuilder vW1 = new StringBuilder();
+        StringBuilder vW2 = new StringBuilder();
         String words[] = word1.split(" ");
         for(char lit: words[words.length - 1].toLowerCase().toCharArray()){
             if(vowels.contains(String.valueOf(lit))){
-                vowelsWord1 += lit;
+                vW1.append(lit);
             }
         }
         words = word2.split(" ");
         for(char lit: words[words.length - 1].toLowerCase().toCharArray()){
             if(vowels.contains(String.valueOf(lit))){
-                vowelsWord2 += lit;
+                vW2.append(lit);
             }
         }
-        return vowelsWord1.equals(vowelsWord2);
+        return vW1.toString().equals(vW2.toString());
     }
 
     /** Фукнция ищет символ, повторяющийся три раза и затем ищет его во втором слове, где он должен повторятся дважды */
@@ -218,17 +215,17 @@ public class Tasks4 {
 
     /** Функция считает кол-во уникальных символов в подстроках строки, которые начинаются и заканчиваются с char c */
     public static int countUniqueBooks(String str, char c){
-        String uniques = "";
+        StringBuilder sb = new StringBuilder();
         int idx = 0;
         boolean inside = false;
         while (idx < str.length()){
             if(str.charAt(idx) == c){
                 inside = !inside;
-            } else if(inside && !uniques.contains(String.valueOf(str.charAt(idx)))){
-                uniques += str.charAt(idx);
+            } else if(inside && sb.indexOf(String.valueOf(str.charAt(idx))) == -1){
+                 sb.append(str.charAt(idx));
             }
             idx++;
         }
-        return uniques.length();
+        return sb.toString().length();
     }
 }

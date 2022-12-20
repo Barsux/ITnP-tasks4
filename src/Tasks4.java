@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class Tasks4 {
     public static void main(String[] args){
         System.out.println("Задача 1");
-        bessie(10, 7, "Hello my name is Bessie and this is my essay");
+        System.out.println(bessie(10, 7, "Hello my name is Bessie and this is my essay"));
         System.out.println("\nЗадача2");
         System.out.println("split(\"()()()\") -> " + Arrays.toString(split("()()()")));
         System.out.println("split(\"((()))\") -> " + Arrays.toString(split("((()))")));
@@ -48,35 +48,32 @@ public class Tasks4 {
     }
 
     /** Функция итерирует по всем словам и в зависимости от суммы результирующей строки и следующего слова определяет добавить ли слово в рез. строку или вывести и очистить её*/
-    public static void bessie(int n, int k, String essay){
+    public static String bessie(int n, int k, String essay){
         String[] words = essay.split(" ");
         StringBuilder result = new StringBuilder();
+        int length = words[0].length();
         result.append(words[0]);
         for(int i = 1; i < n; i++){
-            if(words[i].length() + result.length() <= k) {
+            if(words[i].length() + length <= k) {
                 result.append(" " + words[i]);
+                length += words[i].length();
             } else {
-                System.out.println(result.toString());
-                result = new StringBuilder();
+                result.append('\n');
+                length = words[i].length();
                 result.append(words[i]);
             }
         }
-        System.out.println(result.toString());
+        return result.toString();
     }
 
     /** Функция считает кол-во кластеров, а затем повторно считывает их в массив посчитанной длины */
     public static String[] split(String str){
         char l = '(';
         char r = ')';
-        int counter = 0; int wordCounter = 0;
-        for(char lit: str.toCharArray()){
-            if(lit == l)counter++;
-            else if(lit == r)counter--;
-            if(counter == 0)wordCounter++;
-        }
         StringBuilder temp = new StringBuilder();
-        String[] answer = new String[wordCounter];
-        counter = 0; wordCounter = 0;
+        String[] answer = new String[str.length()];
+        int counter = 0;
+        int arrPtr = 0;
         for(char lit: str.toCharArray()){
             if(lit == l){
                 counter++;
@@ -84,12 +81,12 @@ public class Tasks4 {
             else if(lit == r)counter--;
             temp.append(lit);
             if(counter == 0){
-                answer[wordCounter] = temp.toString();
+                answer[arrPtr] = temp.toString();
                 temp = new StringBuilder();
-                wordCounter++;
+                arrPtr++;
             }
         }
-        return answer;
+        return Arrays.copyOf(answer, arrPtr);
     }
 
     /** Функция разбивает строку по '_' а затем собирает снова капитализируя каждое слово */
@@ -116,21 +113,20 @@ public class Tasks4 {
 
     /** Функция считает кол-во часов обычной работы и кол-во часов сверхурочных, и по ним высчитывает итоговую стоимость */
     public static String overTime(double[] arr){
-        double sum = 0;
-        double EVENING = 17;
         double start = arr[0];
         double end = arr[1];
         double payment = arr[2];
         double bonus = arr[3];
-        if(start > EVENING){
-            sum += (end - start) * payment * bonus;
-        } else if(end > EVENING){
-            sum += (EVENING - start) * payment;
-            sum += (end - EVENING) * payment * bonus;
+        double summa = 0;
+        if(start > 17){
+            summa += (end - start) * payment * bonus;
+        } else if(end > 17){
+            summa += (17 - start) * payment;
+            summa += (end - 17) * payment * bonus;
         } else {
-            sum += (end - start) * payment;
+            summa += (end - start) * payment;
         }
-        return "$" + sum;
+        return "$" + summa;
     }
 
     /** Функция считывает вес и рост, и в зависимости от значений и входных величин возвращает BMI*/
@@ -164,17 +160,30 @@ public class Tasks4 {
     }
 
     /** Подсчитывает кол-во повторений символов и выводит в виде AAAsdg -> A*3sdg */
-    public static String toStarShorthand(String word){
-        word += " ";
-        StringBuilder sb = new StringBuilder();
-        for (char lit: word.toCharArray()){
-            int length = word.split(String.valueOf(lit)).length - 1;
-            if(sb.indexOf(String.valueOf(lit)) == -1){
-                sb.append(lit);
-                if(length > 1) sb.append("*" + length);
+    public static String toStarShorthand(String s) {
+        if (s.isEmpty()) {
+            return "";
+        }
+        char x = s.charAt(0);
+        int count = 1;
+        s += " ";
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 1; i < s.length(); i++) {
+            if (x != s.charAt(i)) {
+                if (count == 1) {
+                    strBuilder.append(x);
+                }
+                else {
+                    strBuilder.append(x).append("*").append(count);
+                }
+                count = 1;
+                x = s.charAt(i);
+            }
+            else {
+                count ++;
             }
         }
-        return sb.toString();
+        return strBuilder.toString();
     }
 
     /** Проверяет рифмуются ли слова сравнивая гласные последних слов */
@@ -215,17 +224,14 @@ public class Tasks4 {
 
     /** Функция считает кол-во уникальных символов в подстроках строки, которые начинаются и заканчиваются с char c */
     public static int countUniqueBooks(String str, char c){
-        StringBuilder sb = new StringBuilder();
-        int idx = 0;
-        boolean inside = false;
-        while (idx < str.length()){
-            if(str.charAt(idx) == c){
-                inside = !inside;
-            } else if(inside && sb.indexOf(String.valueOf(str.charAt(idx))) == -1){
-                 sb.append(str.charAt(idx));
+        String[] words = str.split("[" + c + "]");
+        StringBuilder unique = new StringBuilder();
+        for(int i = 1; i < words.length; i += 2){
+            for(char lit: words[i].toCharArray()){
+                if(unique.indexOf(lit + "") == -1)unique.append(lit);
             }
-            idx++;
         }
-        return sb.toString().length();
+
+        return unique.length();
     }
 }
